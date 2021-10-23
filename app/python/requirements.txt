@@ -1,0 +1,4 @@
+flask
+pyqrcode
+pyzbar
+Pillow
