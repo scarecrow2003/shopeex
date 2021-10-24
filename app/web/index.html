@@ -48,9 +48,15 @@
         </h2>
         <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
           <div class="accordion-body">
-            <form>
-              <input type="text" id="query" onkeyup="showSuggestion(event)">
-            </form>
+            <div class="row">
+              <input type="text" class="form-control form-control-lg" id="query" placeholder="Please enter last 4 digits of the QR code" onkeyup="showSuggestion(event)" onclick="selectAll()">
+            </div>
+            <div class="row">
+              <div id="suggestion-list"></div>
+            </div>
+            <div class="row">
+              <div id="suggestion-photos"></div>
+            </div>
           </div>
         </div>
       </div>

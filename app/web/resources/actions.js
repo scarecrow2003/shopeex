@@ -1,4 +1,4 @@
-let codes = [];
+let codes = new Map();
 
 function loadPhotos() {
     $("#loadPhoto").hide();
@@ -35,32 +35,97 @@ function confirmQrCode() {
         url: '/app/confirm',
         type: 'POST',
         data: formData,
-        dataType: "json",
+        dataType: "JSON",
         success: function(result) {
-            codes = result.split(",");
-            $('#headingTwo').click();
+            for (let i=0; i<result.length; i++) {
+                let one = result[i]
+                for (let j=0; j<one.length; j++) {
+                    codes.set(one[j], one);
+                }
+            }
+            $('#collapseTwo').collapse("toggle");
         }
     });
 }
 
 function showSuggestion(event) {
     if (event.key === 'Enter' || event.keyCode === 13) {
-        let query = $("#query").value;
+        let query = $("#query").val();
         if (query) {
             let suggestion = [];
-            for (let i = 0; i < codes.length; i++) {
-                if (codes[i].indexOf(query, codes[i].length - query.length) !== -1) {
-                    suggestion.push(codes[i]);
-                //    display list of suggestions
+            codes.forEach(function(value, key) {
+                if (key.indexOf(query, key.length - query.length - 1) !== -1) {
+                    suggestion.push(key);
                 }
+            });
+            if (suggestion.length > 0) {
+                if (suggestion.length === 1) {
+                    $("#suggestion-list").html("");
+                    displayPhoto(codes.get(suggestion[0]));
+                } else {
+                    displaySuggestion(suggestion);
+                    $("#suggestion-photos").html("");
+                }
+            } else {
+                $("#suggestion-list").html("Not found");
+                $("#suggestion-photos").html("");
             }
-            if (suggestion.length === 1) {
-                // display photo
-            }
+        } else {
+            $("#suggestion-list").html("");
+            $("#suggestion-photos").html("");
         }
+        $(this).focus(function() {
+            $(this).select();
+        });
     }
 }
 
-function displayPhoto(code) {
+function displayPhoto(codes) {
+    let fileNames = []
+    if (codes.length > 1) {
+        for (let i=0; i<codes.length; i++) {
+            fileNames.push(codes[i]);
+        }
+    }
+    let code = codes[codes.length - 1];
+    fileNames.push(code + '-1');
+    fileNames.push(code + '-2');
+    let html = '';
+    let today = formattedToday();
+    for (let j=0; j<fileNames.length; j++) {
+        html += '<div class="col-md-3"><img src="/final/' + today + '/' + fileNames[j] + '.jpg" alt="#" class="img-fluid"></div>';
+    }
+    $("#suggestion-photos").html(html);
+}
 
+function displaySuggestion(suggestion) {
+    let html = '';
+    for (let i=0; i<suggestion.length; i++) {
+        let photos = '[';
+        let val = codes.get(suggestion[i]);
+        for (let j = 0; j<val.length; j++) {
+            photos += '"' + val[j] + '"';
+            if (j === val.length - 1) {
+                photos += ']';
+            } else {
+                photos += ',';
+            }
+        }
+        html += '<div class="col-md-3"><button type="button" class="btn btn-primary btn-lg" onclick="displayPhoto(' + photos + ')">' + suggestion[i] + '</button></div>';
+    }
+    $("#suggestion-list").html(html);
+}
+
+function formattedToday() {
+    const today = new Date(Date.now());
+    let result = "" + today.getFullYear();
+    const month = today.getMonth() + 1;
+    result += (month >= 10 ? "" : "0") + month;
+    const date = today.getDate();
+    result += (date >= 10 ? "" : "0") + date;
+    return result;
+}
+
+function selectAll() {
+    $(this).select();
 }
