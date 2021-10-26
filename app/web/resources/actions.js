@@ -80,39 +80,45 @@ function showSuggestion(event) {
     }
 }
 
+function displayPhotoList(list) {
+    let codes = list.split(',');
+    displayPhoto(codes);
+}
+
 function displayPhoto(codes) {
     let fileNames = []
-    if (codes.length > 1) {
+    let html = '<div class="row">';
+    let today = formattedToday();
+    if (codes.length > 0) {
         for (let i=0; i<codes.length; i++) {
-            fileNames.push(codes[i]);
+            let photo = codes[i].trim();
+            fileNames.push(photo);
         }
     }
-    let code = codes[codes.length - 1];
+    let code = codes[codes.length - 1].trim();
     fileNames.push(code + '-1');
     fileNames.push(code + '-2');
-    let html = '';
-    let today = formattedToday();
     for (let j=0; j<fileNames.length; j++) {
-        html += '<div class="col-md-3"><img src="/final/' + today + '/' + fileNames[j] + '.jpg" alt="#" class="img-fluid"></div>';
+        html += '<div class="col-md-4"><img src="/final/' + today + '/' + fileNames[j] + '.jpg" alt="#" class="img-fluid"></div>';
     }
+    html += '</div>';
     $("#suggestion-photos").html(html);
 }
 
 function displaySuggestion(suggestion) {
-    let html = '';
+    let html = '<div class="row">';
     for (let i=0; i<suggestion.length; i++) {
-        let photos = '[';
+        let photos = '';
         let val = codes.get(suggestion[i]);
         for (let j = 0; j<val.length; j++) {
-            photos += '"' + val[j] + '"';
-            if (j === val.length - 1) {
-                photos += ']';
-            } else {
+            photos += val[j];
+            if (j !== val.length - 1) {
                 photos += ',';
             }
         }
-        html += '<div class="col-md-3"><button type="button" class="btn btn-primary btn-lg" onclick="displayPhoto(' + photos + ')">' + suggestion[i] + '</button></div>';
+        html += '<div class="col-md-3"><button type="button" class="btn btn-primary btn-lg" onclick="displayPhotoList(\'' + photos + '\')">' + suggestion[i] + '</button></div>';
     }
+    html += '</div>';
     $("#suggestion-list").html(html);
 }
 
